@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>SoftProj: Home</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home.css}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<header>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown" th:if="${user_roles.contains(adminRole)}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Admin Options
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#addLecturer" data-toggle="modal" data-target="#addLecturer">Add a Lecturer</a>
+                        <a class="dropdown-item" href="/admin/manageAccounts">Manage user accounts</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown" th:if="${user_roles.contains(reviewerRole)}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Reviewer Options
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/reviewer/associatedArtifacts">Review Artifacts</a>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="get">
+                <span class="navbar-text" th:utext="${user.getName()}" style="margin-right:10px"></span>
+                <button class="btn btn-outline-success my-2 my-sm-0" name="logout"
+                        type="Submit">Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+<main role="main" class="container" style="margin-top: 20px">
+    <!-- Modal for add lecturer admin option-->
+    <div class="modal fade" id="addLecturer" tabindex="-1" role="dialog" aria-labelledby="addLecturerLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form autocomplete="off" action="#" th:action="@{/addLecturer}"
+                  method="post" class="form-horizontal"
+                  role="form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addLecturerLabel">Add Lecturer</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-form-label">Assign Lecturer:</label>
+                            <select name="selectedLecturer" class="form-control">
+                                <option th:each="r:${reviewers}" th:value="${r.getUsername()}" th:text="${r.getName()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="alert alert-primary alert-dismissible fade show" role="alert" th:if="${!alertMessage.isEmpty()}">
+        <span th:utext="${alertMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div th:if="${user_roles.contains(submitter)}">
+        
+        <!-- List of places to go as submitter -->
+        <div class="my_content_container">
+            <a href="/upload/">Upload Page</a>
+        </div>
+
+
+        <div class="jumbotron" th:if="${user.getTeam()==null}">
+            <h2 class="display-6" th:utext="${helloMessage}"></h2>
+            <p class="lead">Looks like you aren't part of a team.</p>
+            <hr class="my-2">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#joinTeam">Join a team</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createTeam">
+                Create a team</button>
+
+            <div class="modal fade" id="joinTeam" tabindex="-1" role="dialog" aria-labelledby="joinTeamLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <form autocomplete="off" action="#" th:action="@{/jointeam}"
+                          method="post" class="form-horizontal"
+                          role="form">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="joinTeamLabel">Join a Team</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                    <div class="form-group">
+                                        <label class="col-form-label">Select a team to join:</label>
+                                        <select name="selectedTeam" class="form-control">
+                                            <option th:each="t:${teams}" th:value="${t.getName()}" th:text="${t.getName()}"></option>
+                                        </select>
+
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal fade" id="createTeam" tabindex="-1" role="dialog" aria-labelledby="createTeamLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createTeamLabel">Create a Team</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form autocomplete="off" action="#" th:action="@{/createteam}"
+                                  th:object="${team}" method="post" class="form-horizontal"
+                                  role="form">
+                                <div class="form-group">
+                                        <label th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                                               class="validation-message"></label>
+                                        <label>Name</label>
+                                        <input type="text" th:field="*{name}"
+                                               class="form-control" />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="jumbotron" th:if="${user.getTeam()!=null}">
+            <h2 class="display-6" th:utext="'Team: '+${user.getTeam().getName()}">Team: </h2>
+            <hr class="my-2">
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

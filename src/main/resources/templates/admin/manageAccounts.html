@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Manage Accounts</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<header>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown" th:if="${user_roles.contains(adminRole)}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Admin Options
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#addLecturer" data-toggle="modal" data-target="#addLecturer">Add a Lecturer</a>
+                        <a class="dropdown-item" href="#">Manage user accounts</a>
+                    </div>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="get">
+                <span class="navbar-text" th:utext="${user.getName()}" style="margin-right:10px"></span>
+                <button class="btn btn-outline-success my-2 my-sm-0" name="logout"
+                        type="Submit">Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+<main role="main" class="container" style="margin-top: 20px">
+    <!-- Modal for add lecturer admin option-->
+    <div class="modal fade" id="addLecturer" tabindex="-1" role="dialog" aria-labelledby="addLecturerLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form autocomplete="off" action="#" th:action="@{/addLecturer}"
+                  method="post" class="form-horizontal"
+                  role="form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addLecturerLabel">Add Lecturer</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-form-label">Assign Lecturer:</label>
+                            <select name="selectedLecturer" class="form-control">
+                                <option th:each="r:${reviewers}" th:value="${r.getUsername()}" th:text="${r.getName()}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="alert alert-primary alert-dismissible fade show" role="alert" th:if="${!alertMessage.isEmpty()}">
+        <span th:utext="${alertMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="jumbotron">
+        <a class="btn btn-primary" href="/registration">Create a User</a>
+        <hr my-2 >
+        <h2>Manage Users</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id</th></tg>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>PreferredRole</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each = "user: ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.preferredRole}"></td>
+                <td>
+                    <form autocomplete="off" action="#" th:action="@{/editUser}"
+                          method="post" class="form-horizontal"
+                          role="form">
+                        <button type="submit" class="btn btn-primary" name="editUser" th:value="${user.username}">Edit</button>
+                    </form>
+                </td>
+                <td>
+                    <form autocomplete="off" action="#" th:action="@{/admin/deleteUser}"
+                          method="post" class="form-horizontal"
+                          role="form">
+                        <button type="submit" class="btn btn-primary" name="username" th:value="${user.username}">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>
